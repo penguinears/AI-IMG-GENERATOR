@@ -1,39 +1,28 @@
-const API_KEY = '[YOUR API KEY HERE]';
 const submiticon = document.querySelector('#submit-icon');
-const inputElement= document.querySelector('input');
+const inputElement = document.querySelector('input');
 const imageSection = document.querySelector('.image-section');
 
-const getImages = async () => { 
-    const options = {
-        method: 'POST',
-        headers: {
-            "Authorization": `Bearer ${API_KEY}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            'prompt': inputElement.value,
-            'n':2,
-            'size':"1024x1024"
-        })
+const getImages = async () => {
+    const prompt = encodeURIComponent(inputElement.value); // encode prompt for URL
+    const n = 2; // number of images
+    imageSection.innerHTML = ''; // clear previous images
+
+    try {
+        for (let i = 0; i < n; i++) {
+            // Pollinations API URL
+            const url = `https://image.pollinations.ai/prompt/${prompt}`;
+            const imageContainer = document.createElement('div');
+            imageContainer.classList.add('image-container');
+
+            const img = document.createElement('img');
+            img.src = url; // Pollinations generates the image directly via URL
+            imageContainer.appendChild(img);
+
+            imageSection.appendChild(imageContainer);
+        }
+    } catch (error) {
+        console.error(error);
     }
-    try 
-    {
-       const response = await fetch('https://api.openai.com/v1/images/generations', options)
-         const data = await response.json()
-       
-            data?.data.forEach((imageObject) => 
-            {
-                const ImageContainer = document.createElement('div')
-                ImageContainer.classList.add('image-container')
-                const imageElement = document.createElement('img')
-                imageElement.setAttribute('src', imageObject.url)
-                ImageContainer.append(imageElement)
-                imageSection.append(ImageContainer)
-            })
-    }
-    catch (error)
-    {
-        console.log(error)
-    }
-}
-submiticon.addEventListener('click', getImages)
+};
+
+submiticon.addEventListener('click', getImages);
